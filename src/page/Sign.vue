@@ -12,62 +12,41 @@
             <div class="js-sign-up-container">
                 <form class="new_user" id="new_user" @submit="doSign($event,isLoginUp)" accept-charset="UTF-8"
                       method="post">
-                    <input name="utf8" type="hidden" value="✓">
-                    <input type="hidden" name="authenticity_token" value="9qP2Rk6oo+llcoOIolNcOnrBWBV0VKUsXLCjy0llIMCQS3QcTltddqXA5WuXi1eHZhKRIR1XuAC2ypD8u4ezzQ==">
                     <div v-if="isLoginUp" class="input-prepend restyle">
-                        <input placeholder="你的昵称" type="text" value="" name="user[nickname]" id="user_nickname">
-                        <i class="iconfont ic-user"></i>
+                        <input placeholder="你的昵称" type="text" v-model="form.nickName">
+                        <i class="icon-font ic-user"></i>
                     </div>
                     <div class="input-prepend restyle no-radius js-normal">
-                        <input type="hidden" value="CN" name="user[mobile_number_country_code]"
-                               id="user_mobile_number_country_code">
-                        <input placeholder="手机号" type="tel" name="user[mobile_number]" id="user_mobile_number">
-                        <i class="iconfont ic-phone-number"></i>
+                        <input placeholder="邮箱" type="tel" v-model="form.email">
+                        <i class="icon-font ic-phone-number"></i>
                     </div>
-                    <input type="hidden" name="oversea" id="oversea" value="false">
-                    <input type="hidden" name="force_user_nonexist" id="force_user_nonexist" value="true">
-                    <div style="display: none"
+                    <div v-if="isLoginUp&&form.email"
                          class="input-prepend restyle no-radius security-up-code js-security-number hide">
-                        <input type="text" name="sms_code" id="sms_code" placeholder="手机验证码">
-                        <i class="iconfont ic-verify"></i>
-                        <a tabindex="-1" class="btn-up-resend js-send-code-button disable" href="javascript:void(0);"
-                           id="send_code">发送验证码</a>
-                        <div>
-                            <div class="captcha"><input name="captcha[validation][challenge]" autocomplete="off"
-                                                        type="hidden" value="fbe7ba5b52745d2812dbd181040cea31"> <input
-                                    name="captcha[validation][gt]" autocomplete="off" type="hidden"
-                                    value="ec47641997d5292180681a247db3c92e"> <input
-                                    name="captcha[validation][validate]"
-                                    autocomplete="off" type="hidden"
-                                    value=""> <input
-                                    name="captcha[validation][seccode]" autocomplete="off" type="hidden" value="">
-                                <input
-                                        name="captcha[id]" autocomplete="off" type="hidden" value="">
-                                <div id="geetest-area" class="geetest"></div>
-                            </div>
-                        </div>
+                        <input type="text" placeholder="邮箱验证码" v-model="form.code">
+                        <i class="icon-font ic-verify"></i>
+                        <button class="btn-up-resend "
+                           :disabled="!checkEmail" :class="checkEmail?'':'unTouch'"  @click="sendVerificationCode"><span>{{vfCodeBtn.timeNum}}</span>发送验证码</button>
                     </div>
-                    <input type="hidden" name="security_number" id="security_number">
                     <div class="input-prepend">
-                        <input :placeholder="isLoginUp?'设置密码':'密码'" type="password" name="user[password]"
-                               id="user_password">
-                        <i class="iconfont ic-password"></i>
+                        <input :placeholder="isLoginUp?'设置密码':'密码'" type="password" v-model="form.password">
+                        <i class="icon-font ic-password"></i>
                     </div>
-                    <input type="submit" name="commit" :value="isLoginUp?'注册':'登录'" class="sign-up-button"
-                           id="sign_up_btn"
-                           data-disable-with="注册">
-                    <p v-if="isLoginUp" class="sign-up-msg">点击 “注册” 即表示您同意并愿意遵守简书<br> <a target="_blank"
-                                                                                         href="http://www.jianshu.com/p/c44d171298ce">用户协议</a>
-                        和 <a target="_blank" href="http://www.jianshu.com/p/2ov8x3">隐私政策</a> 。</p>
+                    <input :disabled="actionBtn.disable" :class="actionBtn.unTouch" type="submit" @click="action(isLoginUp)"
+                           name="commit" :value="isLoginUp?'注册':'登录'"
+                           class="sign-up-button">
+                    <p v-if="isLoginUp" class="sign-up-msg">点击 “注册” 即表示您同意并愿意遵守简书
+                        <br>
+                        <a target="_blank">用户协议</a>
+                        和<a target="_blank">隐私政策</a> 。</p>
                 </form>
                 <!-- 更多注册方式 -->
                 <div class="more-sign">
-                    <h6>社交帐号直接{{isLoginUp?'注册':'登录'}}</h6>
+                    <h6>社交帐号直接登录</h6>
                     <ul>
                         <li><a id="weixin" class="weixin" target="_blank" href="/users/auth/wechat"><i
-                                class="iconfont ic-wechat"></i></a></li>
+                                class=" ic-wechat"></i></a></li>
                         <li><a id="qq" class="qq" target="_blank" href="/users/auth/qq_connect"><i
-                                class="iconfont ic-qq_connect"></i></a></li>
+                                class="ic-qq_connect"></i></a></li>
                     </ul>
 
                 </div>
@@ -84,22 +63,97 @@
         data() {
             return {
                 isLoginUp: false,
+                actionBtn:{
+                    disable: false,
+                    unTouch: '',//unTouch
+                },
+                vfCodeBtn:{
+                    disable: false,
+                    unTouch: '',//unTouch
+                    timeNum:'',
+                },
+
+                form: {
+                    nickName: '',
+                    email: '',
+                    code: '',
+                    password: '',
+                }
             }
         },
 
+
         methods: {
-            doSign(event, isLoginUp) {
-                console.log(event.target);
-                this.axios.post('/user/register',{
-                    name: 'name',
-                    phone:13208190472,
-                    password:'15922',
-                    email: '583179913@qq.com'
-                }).then((data) => {
+            login() {
+                this.http.post('/user/login',
+                    {
+                        email: this.form.email,
+                        password: this.form.password,
+                    }
+                ).then((data) => {
                     console.log(data)
-                    // 处理数据
                 });
+            },
+            register() {
+                this.http.post('/user/register',
+                    {
+                        name: this.form.nickName,
+                        phone: null,
+                        code:this.form.code,
+                        password: this.form.password,
+                        email: this.form.email
+                    }
+                ).then((data) => {
+                    console.log(data)
+                });
+            },
+            doSign(event, isLoginUp) {
                 event.preventDefault();
+
+                let valid = Object.entries(this.form).find(item => item == '');
+                valid ?  (() => {
+                    const h = this.$createElement;
+                    this.$notify({title: '提示', message: h('i', {style: 'color: red'}, '请输入')});
+                })():(() => {
+                    this.actionBtn.disable = true;
+                    this.actionBtn.unTouch='unTouch';
+                    let task = setTimeout(() => {
+                        this.actionBtn.disable = false;
+                        this.actionBtn.unTouch='';
+                    }, 5000);
+                    isLoginUp ? this.register() : this.login()
+                })();
+
+
+            },
+            sendVerificationCode() {
+                this.vfCodeBtn.disable=true;
+                this.vfCodeBtn.timeNum=60+'';
+                let task=setInterval(()=>{
+                    this.vfCodeBtn.timeNum--;
+                    if(this.vfCodeBtn.timeNum===0){
+                        clearInterval(task)
+                        this.vfCodeBtn.disable=false;
+                    }
+                },1000);
+                this.http.get('/user/sendMail', {email: this.form.email})
+                    .then((data) => {
+                        console.log(data)
+                    })
+
+            },
+            action(boo) {
+                if (boo) {
+
+                } else {
+
+                }
+
+            },
+        },
+        computed: {
+            checkEmail() {
+                return (!this.vfCodeBtn.disable) && /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/.test(this.form.email)
             }
         },
 
@@ -117,6 +171,10 @@
 </script>
 
 <style scoped>
+    .unTouch {
+        background: #ccc !important;
+        cursor: not-allowed !important;
+    }
 
     .sign {
         height: 100%;
@@ -174,7 +232,7 @@
         clear: both;
     }
 
-    .iconfont {
+    .icon-font {
         display: block;
         width: 32px;
         height: 32px;
@@ -370,5 +428,19 @@
         height: 27px;
         background-size: 68% 86% !important;
         background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABdElEQVRYR+2X/VHDMAzFpQlgA9oJYIP2ZQFgAtiAdgJgAsIG3QC6QF7YoExARigTiFMu7oVCWoePcNxZ/+QuluWfn21ZVulpJA/NbKKqUxE5abqvzKzMsmzZM5xonw4kz0TkTkRGHf0qEZkDeIyNGw1AciEiF5GBcwDzGN8oAJKzZuYxMYOPK5Hv67AXgKTL/dIOZGbPqjoDUPp/klMzy1X1eGvAMQBflk6LAfBZXLUiLAH4XvhgJH3tT1sN9wBcva8DFEVRqeqRRzCzV1UdAVh3APgJcf+Dpr0CMP4WAEmLmX3w2VYBwE6VY5agDXAL4GbXjEh6+3XwSQD/RwGSntc9zXqO/03z3OFJauWD1JvQL5gm2fh3CPNj7ElqHQA8sTwMMXJrjHO/tALAu6MzEEh9pBNAUiApkBRICiQF/lKB+uESALwI4UC3YKteRbmpiouiKFV1MgSEmT1lWVZXXhuApiq6NLNPXz0/Baaq/npahMfNG7Es4iGkurLMAAAAAElFTkSuQmCC") 49%, 100%;
+    }
+
+    .sign .btn-in-resend, .sign .btn-up-resend {
+        border: none;
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        width: 100px;
+        height: 36px;
+        font-size: 13px;
+        color: #fff;
+        background-color: #42c02e;
+        border-radius: 20px;
+        line-height: 36px;
     }
 </style>
