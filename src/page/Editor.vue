@@ -1,44 +1,140 @@
 <template>
     <div class='editor-page'>
         <ul class="editor-title-list">
-            <li class="new-art">新建文章</li>
-            <li>
+            <li class="new-art" @click="newArticle">新建文章</li>
+            <li v-for="(article,index) in articles" :style="{backgroundColor: index===clickIndex?'#e6e6e6':'white'}" @click="switchArticle(index)" >
                 <i class="file-img"></i>
-                <div class="editor-setting">
+                <div class="editor-setting" @click.stop="deleteArticle">
                     <i class="editor-setting-img"></i>
                     <div></div>
                 </div>
-                <span class="editor-title">2018-5</span>
-                <span class="editor-content">2018-5</span>
-                <span class="editor-total">字数：0</span>
+                <span class="editor-title">{{article.title}}</span>
+                <span class="editor-content">{{article.publish_time}}</span>
+                <span class="editor-total">字数：{{article.content.length}}</span>
             </li>
         </ul>
-        <div class="editor">
-            <input class="title"  value="2018"/>
-            <button @click="this.subOk">提交</button>
-            <div class="editor-main">
 
+        <div class="editor"  >
+            <input  class="title"  v-model="articles[clickIndex].title"/>
+            <button class="submit" @click="subOk">提交</button>
+            <button class="back" @click="back">返回主页</button>
+            <div class="editor-main">
             </div>
         </div>
     </div>
 </template>
 
 <script>
+    import moment from 'moment';
     import Editor from 'wangeditor';
     let editor=null;
-
     export default {
         name: "editor",
 
         data(){
             return{
-
+                clickIndex:0,
+                articles:[{title:'',content:'',publish_time:''}],
             }
         },
         methods:{
+            back(){
+                this.$router.replace({path:'/'})
+            },
+            newArticle(){
+                this.articles.unshift({
+                    title:moment().format("YYYY-MM-DD"),
+                    publish_time:'',
+                    content:'',
+                });
+                editor.txt.html('');
+            },
+            switchArticle(index){
+                this.clickIndex=index;
+                editor.txt.html( this.articles[this.clickIndex].content);
+            },
+            getData(){
+                this.http.get('/article/list',
+                    {
+                        id:'2'
+                    }
+                ).then((data) => {
+                    if(data.data&&data.data.length!==0){
+                        this.articles=data.data;
+                        editor.txt.html( this.articles[this.clickIndex].content);
+                        console.log(this.articles);
+                    }
+                    if(data.code!=200){
+                        this.$notify({title: '提示', message: this.$createElement('i', {style: 'color: '+data.code===200?'blue':'red'}, data.msg)});
+                    }
+                 });
+            },
+            add(){
+                console.log( this.articles[this.clickIndex]);
+                this.http.post('/article/add',
+                    {
+                        ... this.articles[this.clickIndex]
+                    }
+                ).then((data) => {
+                    this.$notify(
+                        {title: '提示', message: this.$createElement('i', {style: 'color: '+data.code===200?'blue':'red'}, data.msg)});
+                    this.getData();
+                });
+                console.log();
+            },
+            deleteArticle(){
+                console.log( this.articles[this.clickIndex]);
+                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.http.post('/article/delete',
+                        {
+                            id:this.articles[this.clickIndex].id
+                        }
+                    ).then((data) => {
+                        if(data.code!=200){
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+                            if(this.clickIndex!==0){
+                                this.clickIndex--;
+                            }
+                            this.getData();
+                        }
+
+                    });
+
+                }).catch(err=>{});
+
+                console.log();
+            },
+            update(){
+                console.log( this.articles[this.clickIndex]);
+                this.http.post('/article/update',
+                    {
+                        ... this.articles[this.clickIndex]
+                    }
+                ).then((data) => {
+                    this.$notify(
+                        {title: '提示', message: this.$createElement('i', {style: 'color: '+data.code===200?'blue':'red'}, data.msg)});
+                    this.getData();
+                });
+                console.log();
+            },
 
             subOk(){
-                console.log(editor.txt.html());
+                this.articles[this.clickIndex].content=editor.txt.html();
+                this.articles[this.clickIndex].user_id='2';
+                this.articles[this.clickIndex].publish_time=moment().format("YYYY-MM-DD HH:MM:SS");
+                this.articles[this.clickIndex].preview=this.articles[this.clickIndex].content.substr(0,100);
+                if( this.articles[this.clickIndex].id==null){
+                    this.add()
+                }else{
+                    this.update()
+                }
             }
 
         },
@@ -46,6 +142,7 @@
             // 创建编辑器
             editor = new Editor('.editor-main');
             editor.create();
+            this.getData();
         }
     }
 </script>
@@ -63,7 +160,15 @@
         height: 100%;
         position: relative;
     }
-    .editor>button{
+
+    .editor>.back{
+        position: absolute;
+        right: 30px;
+        top: 10px;
+        width: 80px;
+        height: 30px;
+    }
+    .editor>.submit{
         position: absolute;
         right: 30px;
         top: 57px;

@@ -1,5 +1,6 @@
 import axios from 'axios';
-
+// 允许携带cookie
+axios.defaults.withCredentials=true
 export default class Http {
     static  get(url,data,suc,err) {
         let baseQuest=(url,data,suc,err)=>{

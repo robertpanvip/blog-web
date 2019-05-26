@@ -27,3 +27,6 @@ a:hover {
 .w-e-text-container{
     height: calc(100vh - 36px) !important;
 }
+.el-message-box__wrapper{
+    z-index: 20000 !important;
+}

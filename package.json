@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "cookies": "^0.7.3",
     "core-js": "^2.6.5",
     "dialog-model": "^1.0.8",
     "element-ui": "^2.8.2",
+    "moment": "^2.24.0",
     "vue": "^2.6.10",
     "vue-router": "^3.0.6",
     "wangeditor": "^3.1.1"

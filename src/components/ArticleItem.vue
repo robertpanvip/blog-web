@@ -2,14 +2,11 @@
     <div class='article-page'>
         <div class="user-info">
             <img src="./../static/img/noavatar_middle.gif"/>
-            <span class="user-name">slom123</span>
-            <span>发布于:4天前</span>
+            <span class="user-name">{{data.name}}</span>
+            <span>发布于:{{data.publish_time}}</span>
         </div>
-        <h2 class="title">Docker实践(八)：Prometheus + Grafana + 钉钉搭建监控告警系统<span class="recommend">荐</span></h2>
-        <p class="content">
-            环境说明：主机名Docker版本Prometheus版本Nodeexporter版本cAdvisor版本Grafana版本ip地址docker0118.09.22.9.20.18.0v0.32.0v6.1.6172.27.9.71docker0218.09.2/0.18.0v0.32.0/172.27.9.75ubuntu安装详见：Ubuntu16.04.5以lvm
-            环境说明：主机名Docker版本Prometheus版本Nodeexporter版本cAdvisor版本Grafana版本ip地址docker0118.09.22.9.20.18.0v0.32.0v6.1.6172.27.9.71docker0218.09.2/0.18.0v0.32.0/172.27.9.75ubuntu安装详见：Ubuntu16.04.5以lvm
-        </p>
+        <h2 class="title">{{data.title}}<span class="recommend">荐</span></h2>
+        <p class="content" v-html="data.preview"></p>
         <div class="intro">
             <a class="selected">精选文章</a>
             <a class="do">阅读1810</a>
@@ -23,6 +20,18 @@
 <script>
     export default {
         name: "article-item",
+        props:{
+            data:{
+                type:Object,
+                default:()=>({
+                    user_name:'',
+                    publish_time:'',
+                    title:'',
+                    content:'',
+                    preview:''
+                })
+            }
+        },
 
         data() {
             return {}

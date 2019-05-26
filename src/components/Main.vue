@@ -9,7 +9,7 @@
                     <li class="flex-center"><a href="#">关注</a></li>
                 </ul>
                 <ul class="nav-right">
-                    <li class="flex-center write"><a @click="()=>{this.$router.push({name:'editor'})}">写文章</a></li>
+                    <li class="flex-center write"><a @click="write">写文章</a></li>
                     <li class="flex-center search"><a href="#">搜索</a></li>
                     <li class="flex-center"><a @click="()=>{this.$router.push({name:'sign',query:{up:0}})}">登陆</a></li>
                     <li class="flex-center"><a @click="()=>{this.$router.push({name:'sign',query:{up:1}})}">注册</a></li>
@@ -25,6 +25,22 @@
         name: 'main-index',
         props: {
             msg: String
+        },
+        data(){
+            return{
+
+            }
+        },
+        methods:{
+            write(){
+                this.http.post('/user/checkLogin', {}).then((data) => {
+                    if(data.data){
+                        this.$router.push({name:'editor'})
+                    }else{
+                        this.$router.push({name:'sign'})
+                    }
+                });
+            }
         }
     }
 </script>

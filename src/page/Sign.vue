@@ -91,6 +91,13 @@
                         password: this.form.password,
                     }
                 ).then((data) => {
+                    this.$notify(
+                        {title: '提示',
+                            message: this.$createElement('i', {style: 'color: '+data.code===200?'blue':'red'},
+                                data.msg)});
+                    if(data.code===200){
+                        this.$router.push({path:"/"})
+                    }
                     console.log(data)
                 });
             },
@@ -104,12 +111,13 @@
                         email: this.form.email
                     }
                 ).then((data) => {
-                    console.log(data)
+
+                    const h = this.$createElement;
+                    this.$notify({title: '提示', message: h('i', {style: 'color: red'}, data.msg)});
                 });
             },
             doSign(event, isLoginUp) {
                 event.preventDefault();
-
                 let valid = Object.entries(this.form).find(item => item == '');
                 valid ?  (() => {
                     const h = this.$createElement;

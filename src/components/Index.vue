@@ -2,13 +2,7 @@
     <div class='index-page'>
         <div class="index-page-main">
             <div class="left">
-                <ArticleItem/>
-                <ArticleItem/>
-                <ArticleItem/>
-                <ArticleItem/>
-                <ArticleItem/>
-                <ArticleItem/>
-
+                <ArticleItem  v-for=" articles in articles" :data="articles"/>
             </div>
             <div class="right">
                 <div class="write"><a class="want-write">快去写文章</a><span class="want-write-location">记录自己的技术轨迹</span></div>
@@ -40,12 +34,30 @@
         },
 
         data() {
-            return {}
+            return {
+                articles:[],
+            }
         },
 
-        methods: {},
+        methods: {
+            getAllData(){
+                this.http.get('/article/listAll', {}).then((data) => {
+                    if(data.data&&data.data.length!==0){
+                        this.articles=data.data;
+                    }
+                    if(data.code!=200){
+                        this.$notify({title: '提示', message: this.$createElement('i', {style: 'color: '+data.code===200?'blue':'red'}, data.msg)});
+                    }
+                });
+            }
+
+        },
 
         filters: {},
+
+        mounted(){
+           this.getAllData()
+        },
 
         created() {
 

@@ -45,14 +45,20 @@ module.exports = {
 
     devServer: {
         port: 8085, // 端口号
-        host: '192.168.0.107',
+        host: '192.168.0.108',
         https: false, // https:{type:Boolean}
         open: true, //配置自动启动浏览器
         // proxy: 'http://localhost:4000' // 配置跨域处理,只有一个代理
         proxy: {
             '/user': {
                 //ws: true,
-                target:'http://192.168.0.107:8000',
+                target:'http://192.168.0.108:8000',
+                changeOrigin: true,
+
+            },
+            '/article': {
+                //ws: true,
+                target:'http://192.168.0.108:8000',
                 changeOrigin: true,
 
             },
