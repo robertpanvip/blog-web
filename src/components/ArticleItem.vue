@@ -1,5 +1,5 @@
 <template>
-    <div class='article-page'>
+    <div class='article-page' @click="articleClick">
         <div class="user-info">
             <img src="./../static/img/noavatar_middle.gif"/>
             <span class="user-name">{{data.name}}</span>
@@ -20,15 +20,15 @@
 <script>
     export default {
         name: "article-item",
-        props:{
-            data:{
-                type:Object,
-                default:()=>({
-                    user_name:'',
-                    publish_time:'',
-                    title:'',
-                    content:'',
-                    preview:''
+        props: {
+            data: {
+                type: Object,
+                default: () => ({
+                    user_name: '',
+                    publish_time: '',
+                    title: '',
+                    content: '',
+                    preview: ''
                 })
             }
         },
@@ -37,9 +37,20 @@
             return {}
         },
 
-        methods: {},
+        methods: {
+            articleClick() {
+                this.$emit('item-click', this.data)
+            }
+        },
 
-        filters: {},
+        filters: {
+
+        },
+
+        mounted() {
+
+        },
+
 
         created() {
 
@@ -57,6 +68,7 @@
         overflow: hidden;
         background: #f7f7f8;
     }
+
     .article-page:hover {
         background: #FFF;
     }
@@ -66,7 +78,8 @@
         margin-bottom: 15px;
         display: flex;
     }
-    .user-info>img{
+
+    .user-info > img {
         width: 32px;
         height: 32px;
         margin-right: 10px;
@@ -88,13 +101,15 @@
         font-size: 14px;
         text-align: left;
     }
+
     .intro {
         overflow: hidden;
         line-height: 24px;
         padding-top: 15px;
         text-align: left;
     }
-    .intro>.do{
+
+    .intro > .do {
         margin-left: 10px;
         color: #999;
     }

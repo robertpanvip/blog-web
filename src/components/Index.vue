@@ -1,8 +1,8 @@
 <template>
     <div class='index-page'>
         <div class="index-page-main">
-            <div class="left">
-                <ArticleItem  v-for=" articles in articles" :data="articles"/>
+            <div class="left" >
+                <ArticleItem @item-click="articleItemClick" v-for=" (articles,index) in articles" :data="articles"/>
             </div>
             <div class="right">
                 <div class="write"><a class="want-write">快去写文章</a><span class="want-write-location">记录自己的技术轨迹</span></div>
@@ -20,7 +20,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -30,16 +29,24 @@
     export default {
         name: "index",
         components:{
-            ArticleItem,Writer
+            ArticleItem,Writer,
         },
 
         data() {
             return {
                 articles:[],
+                content:{
+                    data:null,
+                    hidden:true,
+                }
             }
         },
 
         methods: {
+            articleItemClick(data){
+               console.log(data)
+                this.$router.push({name:'article',query:{article_id:data.id}})
+            },
             getAllData(){
                 this.http.get('/article/listAll', {}).then((data) => {
                     if(data.data&&data.data.length!==0){

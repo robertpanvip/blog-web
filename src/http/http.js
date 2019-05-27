@@ -1,10 +1,12 @@
 import axios from 'axios';
+//const base_url='http://www.nerversea.cn:8050';
+const base_url='';
 // 允许携带cookie
 axios.defaults.withCredentials=true
 export default class Http {
     static  get(url,data,suc,err) {
         let baseQuest=(url,data,suc,err)=>{
-            axios.get(url, {params:data}
+            axios.get(base_url+url, {params:data}
             ).then(res => {
                 if(res.status===200){
                     suc(res.data);
@@ -26,7 +28,7 @@ export default class Http {
 
     static post(url,data,suc,err) {
         let baseQuest=(url,data,suc,err)=>{
-            axios.post(url, data).then(res => {
+            axios.post(base_url+url, data).then(res => {
                 if(res.status===200){
                     suc(res.data);
                 }else{

@@ -52,13 +52,13 @@ module.exports = {
         proxy: {
             '/user': {
                 //ws: true,
-                target:'http://192.168.0.108:8000',
+                target:'http://192.168.0.108:8050',
                 changeOrigin: true,
 
             },
             '/article': {
                 //ws: true,
-                target:'http://192.168.0.108:8000',
+                target:'http://192.168.0.108:8050',
                 changeOrigin: true,
 
             },

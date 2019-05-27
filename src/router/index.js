@@ -17,6 +17,12 @@ let router = new VueRouter({
                     component: () => import('@/components/Index'),
                     meta: {name: 'index'},
                 },
+                {
+                    path: '/article',
+                    name: 'article',
+                    component: () => import('@/page/ArticleContent'),
+                    meta: {name: 'article'},
+                },
 
             ]
         },
@@ -31,7 +37,8 @@ let router = new VueRouter({
             name: 'editor',
             component: () => import('@/page/Editor'),
             meta: {name: 'editor'},
-        }
+        },
+
     ]
 });
 export default router;
