@@ -2,12 +2,13 @@
     <div class='article-content-page'>
         <div class='article-content-main'>
             <p class="title">{{article.title}}</p>
-            <div class="content" v-html="article.content"></div>
+            <div class="content" v-cloak  v-html="article.content">
+            </div>
             <div>
                 <span class="meta">路由</span>
                 <span class="meta">网关</span>
                 <div class="action-btn-group">
-                    <span class="action-dian-zan"><img src="./../static/img/like.svg"/>点赞</span>
+                    <span class="action-dian-zan" @click="dian_zan"><img src="./../static/img/like.svg"/>点赞</span>
                     <div>
                         <span class="action-sou-chang"><img src="./../static/img/star.svg"/>收藏</span>
                         <span class="action-share"><img src="./../static/img/share.svg"/>分享</span>
@@ -83,6 +84,19 @@
                 });
 
 
+            },
+            dian_zan(){
+               /* this.http.get('/article/getById', {id: this.id}).then((data) => {
+                    if (data.data) {
+                        this.article = data.data;
+                    }
+                    if (data.code != 200) {
+                        this.$notify({
+                            title: '提示',
+                            message: this.$createElement('i', {style: 'color: ' + data.code === 200 ? 'blue' : 'red'}, data.msg)
+                        });
+                    }
+                });*/
             }
 
         },
@@ -128,6 +142,7 @@
         margin-bottom: 20px;
     }
 
+
     .meta {
          padding: 2px 10px;
          margin-left: 10px;
@@ -153,6 +168,7 @@
         height: 40px;
         border-radius: 5px;
         text-align: center;
+        cursor: pointer;
     }
 
     .action-sou-chang {
@@ -161,6 +177,7 @@
         height: 40px;
         border-radius: 5px;
         text-align: center;
+        cursor: pointer;
     }
 
     .action-share {
@@ -169,6 +186,7 @@
         height: 40px;
         border-radius: 5px;
         text-align: center;
+        cursor: pointer;
     }
 
     .writer {
@@ -308,4 +326,5 @@
         color: #4285f4;
         cursor: pointer;
     }
+
 </style>
