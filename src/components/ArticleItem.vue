@@ -1,19 +1,19 @@
 <template>
     <div class='article-page' @click="articleClick">
         <div class="user-info">
-            <img src="./../static/img/noavatar_middle.gif"/>
+            <img v-if="data.head_url" :src="data.head_url"/>
+            <img v-else src="./../static/img/head.jpg"/>
             <span class="user-name">{{data.name}}</span>
             <span>发布于:{{data.publish_time}}</span>
         </div>
-        <h2 class="title">{{data.title}}<span class="recommend">荐</span></h2>
+        <h2 class="title">{{data.title}}<span v-if="selected&&index<=4" class="recommend">荐</span></h2>
         <p class="content" v-html="data.preview"></p>
-        <div class="intro">
-            <a class="selected">精选文章</a>
-            <a class="do">阅读1810</a>
-            <a class="do">评论 0</a>
-            <a class="do">收藏 5</a>
+        <div v-if="data.flows"  class="intro">
+            <a v-if="selected&&index<=9" class="selected">精选文章</a>
+            <a class="do">阅读{{data.flows}}</a>
+            <a class="do">评论 {{data.comments.length}}</a>
+            <a class="do">收藏 {{data.collections.length}}</a>
         </div>
-        <button></button>
     </div>
 </template>
 
@@ -21,6 +21,14 @@
     export default {
         name: "article-item",
         props: {
+            selected:{
+              type:Boolean,
+              default:false,
+            },
+            index:{
+                type:Number,
+                default:0,
+            },
             data: {
                 type: Object,
                 default: () => ({
@@ -28,7 +36,9 @@
                     publish_time: '',
                     title: '',
                     content: '',
-                    preview: ''
+                    preview: '',
+                    comments:[],
+                    collections:[],
                 })
             }
         },
@@ -66,11 +76,13 @@
         font-size: 12px;
         position: relative;
         overflow: hidden;
-        background: #f7f7f8;
+     /*   background: #f7f7f8;*/
+        color: black;
     }
 
     .article-page:hover {
         background: #FFF;
+        border-radius: 5px;
     }
 
     .user-info {

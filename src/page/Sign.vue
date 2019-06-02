@@ -96,6 +96,7 @@
                             message: this.$createElement('i', {style: 'color: '+data.code===200?'blue':'red'},
                                 data.msg)});
                     if(data.code===200){
+                        localStorage.setItem('userInfo',JSON.stringify(data.data))
                         this.$router.push({path:"/"})
                     }
                     console.log(data)
@@ -111,7 +112,6 @@
                         email: this.form.email
                     }
                 ).then((data) => {
-
                     const h = this.$createElement;
                     this.$notify({title: '提示', message: h('i', {style: 'color: red'}, data.msg)});
                 });

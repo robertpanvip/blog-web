@@ -34,6 +34,7 @@
         data(){
             return{
                 clickIndex:0,
+                userInfo :JSON.parse(localStorage.getItem('userInfo')),
                 articles:[{title:'',content:'',publish_time:''}],
             }
         },
@@ -56,7 +57,7 @@
             getData(){
                 this.http.get('/article/list',
                     {
-                        id:'2'
+                        user_id:this.userInfo.id
                     }
                 ).then((data) => {
                     if(data.data&&data.data.length!==0){
@@ -102,9 +103,9 @@
                             if(this.clickIndex!==0){
                                 this.clickIndex--;
                             }
-                            this.getData();
-                        }
 
+                        }
+                        this.getData();
                     });
 
                 }).catch(err=>{});

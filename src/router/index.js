@@ -18,10 +18,22 @@ let router = new VueRouter({
                     meta: {name: 'index'},
                 },
                 {
+                    path: '/articles',
+                    name: 'articles',
+                    component: () => import('@/page/ArticleList'),
+                    meta: {name: 'articles'},
+                },
+                {
                     path: '/article',
                     name: 'article',
                     component: () => import('@/page/ArticleContent'),
                     meta: {name: 'article'},
+                },
+                {
+                    path: '/follow',
+                    name: 'follow',
+                    component: () => import('@/page/Follow'),
+                    meta: {name: 'follow'},
                 },
 
             ]
@@ -37,6 +49,12 @@ let router = new VueRouter({
             name: 'editor',
             component: () => import('@/page/Editor'),
             meta: {name: 'editor'},
+        },
+        {
+            path: '/person',
+            name: 'person',
+            component: () => import('@/page/PersonInfo'),
+            meta: {name: 'person'},
         },
 
     ]

@@ -62,9 +62,12 @@ module.exports = {
                 changeOrigin: true,
 
             },
-            '/foo': {
-                target: '<other_url>'
-            }
+            '/action' :{
+                //ws: true,
+                target:'http://192.168.0.108:8050',
+                changeOrigin: true,
+
+            },
         },  // 配置多个代理
     }
 }

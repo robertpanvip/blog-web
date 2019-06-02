@@ -2,23 +2,25 @@
     <div class="selected-writer-content">
         <ul>
             <li class="item">
-                <img src="./../static/img/noavatar_middle.gif" class="item-img"/>
+                <img v-if="data.head_url" :src="data.head_url" class="item-img"/>
+                <img v-else src="./../static/img/head.jpg" class="item-img"/>
                 <div class="item-cont">
                     <div class="item-cont-title">
-                        <h3>作者</h3>
-                        <h4>关注</h4>
+                        <h3>{{data.name}}</h3>
+                        <h4 v-if="data.is_follow" style="color:#ccc;cursor: not-allowed;user-select: none; ">关注</h4>
+                        <h4 v-else @click="follow">关注</h4>
                     </div>
                     <div class="item-cont-cont">
                         <dl>
-                            <dt>334W+</dt>
+                            <dt>{{data.flows}}</dt>
                             <dd>人气</dd>
                         </dl>
                         <dl>
-                            <dt>334W+</dt>
+                            <dt>{{data.comments}}</dt>
                             <dd>评论</dd>
                         </dl>
                         <dl>
-                            <dt>334W+</dt>
+                            <dt>{{data.thumbs_ups}}</dt>
                             <dd>点赞</dd>
                         </dl>
                     </div>
@@ -33,12 +35,43 @@
 <script>
     export default {
         name: "writer-item",
-
-        data() {
-            return {}
+        props:{
+            data:{
+                type:Object,
+                default:()=>({})
+            }
         },
 
-        methods: {},
+        data() {
+            return {
+                userInfo :JSON.parse(localStorage.getItem('userInfo')),
+            }
+        },
+
+        methods: {
+            /**
+             * 关注
+             */
+            follow() {
+                this.http.get('/action/follow', {
+                    user_id: this.userInfo.id,
+                    follow_user_id: this.data.id,
+                    time: new Date()
+                }).then((data) => {
+                    if (data.data) {
+                        console.log(data)
+                    }
+                    if (data.code !== 200) {
+                        this.$notify({
+                            title: '提示',
+                            message: this.$createElement('i', {style: 'color: ' + data.code === 200 ? 'blue' : 'red'}, data.msg)
+                        });
+
+                    }else
+                        this.getData()
+                });
+            },
+        },
 
         filters: {},
 
@@ -94,6 +127,11 @@
         flex-direction: row;
     }
     .item-cont-cont>dl{
-        flex:1
+        flex:1;
+    }
+    dt,dd{
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 </style>

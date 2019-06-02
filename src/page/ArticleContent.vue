@@ -2,48 +2,63 @@
     <div class='article-content-page'>
         <div class='article-content-main'>
             <p class="title">{{article.title}}</p>
-            <div class="content" v-cloak  v-html="article.content">
+            <div class="content" v-cloak v-html="article.content">
             </div>
             <div>
                 <span class="meta">路由</span>
                 <span class="meta">网关</span>
                 <div class="action-btn-group">
-                    <span class="action-dian-zan" @click="dian_zan"><img src="./../static/img/like.svg"/>点赞</span>
+                    <span v-if="!liked" class="action-dian-zan action-press" @click="dian_zan">
+                        <img src="./../static/img/like_press.svg"/>
+                        点赞{{actionInfo.dianZan.length}}
+                    </span>
+                    <span v-else class="action-dian-zan" @click="dian_zan">
+                          <img src="./../static/img/like.svg"/>
+                        点赞{{actionInfo.dianZan.length}}
+                    </span>
                     <div>
-                        <span class="action-sou-chang"><img src="./../static/img/star.svg"/>收藏</span>
-                        <span class="action-share"><img src="./../static/img/share.svg"/>分享</span>
+                        <span v-if="!stared" class="action-sou-chang action-press" @click="collection">
+                               <img src="./../static/img/star_press.svg"/>
+                            收藏{{actionInfo.collection.length}}
+                        </span>
+                        <span v-else class="action-sou-chang" @click="collection">
+                            <img src="./../static/img/star.svg"/>
+                            收藏{{actionInfo.collection.length}}
+                        </span>
+                        <span class="action-share"><img src="./../static/img/share_press.svg"/>分享</span>
                     </div>
                 </div>
             </div>
             <div class="writer">
                 <img class="writer-head-img" src="../static/img/head.jpg">
                 <div class="writer-info">
-                    <span class="writer-name">chellman</span><span class="follow">关注</span><br/>
-                    <span class="writer-name-bellow">6篇文章，9W+人气，0粉丝</span>
+                    <span class="writer-name">{{article.name}}</span><span class="follow" :class="!followed? 'action-press':''" @click="follow">关注</span><br/>
+                    <span class="writer-name-bellow">{{actionInfo.userArticle.length}}篇文章，{{actionInfo.userArticle.flow}}人气，{{actionInfo.follow.length}}粉丝</span>
                 </div>
             </div>
-            <h2 class="comment-title">评论(850)</h2>
+            <h2 class="comment-title">评论({{actionInfo.comments.length}})</h2>
             <div class="comment">
                 <img class="head" src="../static/img/head.jpg">
                 <div class="text-area-main">
-                    <textarea  placeholder="评论或者提问"></textarea>
+                    <textarea v-model="commentContent" placeholder="评论或者提问" @keyup.enter="keyDown"></textarea>
                     <div class="comment-publish">
                         <span>Ctrl+Enter 发布</span>
                         <div class="comment-publish-btn">
                             <div class="comment-publish-btn-cancel">取消</div>
-                            <div class="comment-publish-btn-publish">发布</div>
+                            <div class="comment-publish-btn-publish" @click="commentPublish">发布</div>
                         </div>
                     </div>
                 </div>
-
             </div>
             <ul class="comment-list">
-                <li>
-                    <img class="head" src="../static/img/head.jpg">
+                <li v-for="item in actionInfo.comments.detail">
+                    <img v-if="item.head_url" class="head" :src="item.head_url">
+                    <img v-else class="head" src="../static/img/head.jpg">
                     <div class="content-body">
-                        <span class="commenter">有缘人</span>
-                        <span>2019-5-27</span>
-                        <div>还能在短点吗？？？？？？？还能在短点吗？？？？？？？还能在短点吗？？？？？？？还能在短点吗？？？？？？？还能在短点吗？？？？？？？还能在短点吗？？？？？？？还能在短点吗？？？？？？？还能在短点吗？？？？？？？</div>
+                        <span class="commenter">{{item.name}}</span>
+                        <span>{{moment(item.time)}}</span>
+                        <span v-if="info.id==article.user_id" @click="deleteComment(item.id)" class="delete">删除</span>
+                        <div>{{item.content}}</div>
                         <div class="commenter-action">
                             <span class="dian-zan">点赞</span>
                             <span class="hui-fu">回复</span>
@@ -59,21 +74,46 @@
 </template>
 
 <script>
+    import moment from 'moment'
     export default {
         name: "article-content",
-
         data() {
             return {
                 id: this.$route.query.article_id,
-                article: {}
+                info :JSON.parse(localStorage.getItem('userInfo')),
+                article: {},
+                actionInfo: {
+                    userArticle: {},
+                    collection: {},
+                    comments: {},
+                    dianZan: {},
+                    follow: {}
+                },
+                commentContent: ''
             }
+        },
+        computed: {
+            liked() {
+                return this.actionInfo.dianZan.detail && this.actionInfo.dianZan.detail.find(item => item.user_id == this.info.id)
+            },
+            stared() {
+                return this.actionInfo.collection.detail && this.actionInfo.collection.detail.find(item => item.user_id == this.info.id)
+            },
+            followed() {
+                return this.actionInfo.follow.detail && this.actionInfo.follow.detail.find(item =>item.user_id == this.info.id)
+            },
         },
 
         methods: {
+            moment(date) {
+                return moment(date).format('YYYY-MM-DD HH:MM:SS')
+            },
             getData() {
                 this.http.get('/article/getById', {id: this.id}).then((data) => {
                     if (data.data) {
-                        this.article = data.data;
+                        const {userArticle, collection, comments, dianZan, follow} = data.data;
+                        this.actionInfo = {userArticle, collection, comments, dianZan, follow};
+                        this.article = data.data.article;
                     }
                     if (data.code != 200) {
                         this.$notify({
@@ -82,21 +122,127 @@
                         });
                     }
                 });
-
-
             },
-            dian_zan(){
-               /* this.http.get('/article/getById', {id: this.id}).then((data) => {
+            keyDown(e){
+                if(13 === e.keyCode && e.ctrlKey) {
+                    this.commentPublish()
+                }
+            },
+            /**
+             * 评论
+             */
+            commentPublish() {
+                this.http.post('/action/addComment', {
+                    user_id: this.info.id,
+                    article_id: this.id,
+                    content: this.commentContent,
+                    time: new Date()
+                }).then((data) => {
                     if (data.data) {
-                        this.article = data.data;
+                        console.log(data)
                     }
-                    if (data.code != 200) {
+                    if (data.code !== 200) {
                         this.$notify({
                             title: '提示',
                             message: this.$createElement('i', {style: 'color: ' + data.code === 200 ? 'blue' : 'red'}, data.msg)
                         });
+
+                    }else{
+                        this.commentContent='';
+                        this.getData()
                     }
-                });*/
+
+                });
+            },
+            /**
+             * 删除评论
+             * */
+            deleteComment(id){
+                this.$confirm('确定删除, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(()=>{
+                    this.http.get('/action/deleteComment', {
+                        id: id,
+                    }).then((data) => {
+                        if (data.data) {
+                            console.log(data)
+                        }
+                        if (data.code !== 200) {
+                            this.$notify({
+                                title: '提示',
+                                message: this.$createElement('i', {style: 'color: ' + data.code === 200 ? 'blue' : 'red'}, data.msg)
+                            });
+
+                        }else
+                        this.getData()
+                    });
+                }).catch(()=>{
+
+                });
+
+
+            },
+            /**
+             * 关注
+             */
+            follow() {
+                this.http.get('/action/follow', {
+                    user_id: this.info.id,
+                    follow_user_id: this.article.user_id,
+                    time: new Date()
+                }).then((data) => {
+                    if (data.data) {
+                        console.log(data)
+                    }
+                    if (data.code !== 200) {
+                        this.$notify({
+                            title: '提示',
+                            message: this.$createElement('i', {style: 'color: ' + data.code === 200 ? 'blue' : 'red'}, data.msg)
+                        });
+
+                    }else
+                    this.getData()
+                });
+            },
+            collection() {
+                this.http.get('/action/collection', {
+                    user_id: this.info.id,
+                    article_id: this.id,
+                    time: new Date()
+                }).then((data) => {
+                    if (data.data) {
+                        console.log(data)
+                    }
+                    if (data.code !== 200) {
+                        this.$notify({
+                            title: '提示',
+                            message: this.$createElement('i', {style: 'color: ' + data.code === 200 ? 'blue' : 'red'}, data.msg)
+                        });
+
+                    }else
+                    this.getData()
+                });
+            },
+            dian_zan() {
+                this.http.get('/action/dianZan', {
+                    user_id: this.info.id,
+                    article_id: this.id,
+                    time: new Date()
+                }).then((data) => {
+                    if (data.data) {
+                        console.log(data)
+                    }
+                    if (data.code !== 200) {
+                        this.$notify({
+                            title: '提示',
+                            message: this.$createElement('i', {style: 'color: ' + data.code === 200 ? 'blue' : 'red'}, data.msg)
+                        });
+
+                    }else
+                    this.getData()
+                });
             }
 
         },
@@ -135,22 +281,23 @@
         border: 1px solid #c0ccda;
         overflow: auto;
     }
-    .article-content-main>.title{
+
+    .article-content-main > .title {
         color: #075DB3;
         font-size: 20px;
         margin-top: 20px;
         margin-bottom: 20px;
     }
 
-
     .meta {
-         padding: 2px 10px;
-         margin-left: 10px;
-         height: 30px;
-         border-radius: 5px;
-         background-color: #cccccc;
-         text-align: center;
-     }
+        padding: 2px 10px;
+        margin-left: 10px;
+        height: 30px;
+        border-radius: 5px;
+        background-color: #cccccc;
+        text-align: center;
+    }
+
     .meta:nth-of-type(1) {
         margin-left: 0;
     }
@@ -169,6 +316,10 @@
         border-radius: 5px;
         text-align: center;
         cursor: pointer;
+    }
+
+    .action-press {
+        color: #1296db;
     }
 
     .action-sou-chang {
@@ -230,20 +381,23 @@
         justify-content: left;
         border-bottom: 1px solid #cccccc;
     }
-    .head{
+
+    .head {
         width: 40px;
         height: 40px;
         border-radius: 50%;
     }
-    .text-area-main{
+
+    .text-area-main {
         width: calc(100% - 60px);
     }
-    .text-area-main>textarea{
+
+    .text-area-main > textarea {
         box-sizing: border-box;
         padding: 10px;
         margin-left: 20px;
         font-size: 16px;
-        resize:none;
+        resize: none;
         height: 100px;
         width: 100%;
     }
@@ -259,16 +413,17 @@
     }
 
     .comment-publish-btn-publish {
-          margin-left: 10px;
-          padding: 0 20px;
-          border-radius: 2px;
-          cursor: pointer;
-          line-height: 28px;
-          font-size: 12px;
-          color: #fff;
-          background: #4285f4;
-          border: 1px solid #4285f4;
-      }
+        margin-left: 10px;
+        padding: 0 20px;
+        border-radius: 2px;
+        cursor: pointer;
+        line-height: 28px;
+        font-size: 12px;
+        color: #fff;
+        background: #4285f4;
+        border: 1px solid #4285f4;
+    }
+
     .comment-publish-btn-publish:hover {
         color: #fff;
         background: #3c78dc;
@@ -292,7 +447,8 @@
         margin-top: 10px;
         border-bottom: 1px solid #cccccc;
     }
-    .comment-list>li{
+
+    .comment-list > li {
         display: flex;
         align-items: left;
         justify-content: left;
@@ -307,15 +463,18 @@
         color: red;
         margin-right: 10px;
     }
-    .commenter-action{
+
+    .commenter-action {
         margin-top: 5px;
     }
-    .commenter-action>.dian-zan {
+
+    .commenter-action > .dian-zan {
         margin-right: 50px;
         color: #adadad;
         cursor: pointer;
     }
-    .commenter-action>.hui-fu {
+
+    .commenter-action > .hui-fu {
         color: #adadad;
         cursor: pointer;
     }
@@ -323,8 +482,13 @@
     .follow {
         margin-left: 20px;
         font-size: 18px;
-        color: #4285f4;
         cursor: pointer;
     }
 
+    .delete {
+        margin-left: 50px;
+    }
+    .delete:hover{
+        color: #3c78dc;
+    }
 </style>

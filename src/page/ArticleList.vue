@@ -2,28 +2,17 @@
     <div class='index-page'>
         <div class="index-page-main">
             <div class="left" >
-                <ArticleItem  @item-click="articleItemClick" v-for=" (articles,index) in articles" :data="articles" :index="index" :selected="true"/>
-            </div>
-            <div class="right">
-                <div class="write"><a class="want-write" @click="write">快去写文章</a><span class="want-write-location">记录自己的技术轨迹</span></div>
-                <div class="selected-writer">
-                    <div class="title">
-                        <h3>推荐作者</h3>
-                        <h4>更多</h4>
-                    </div>
-                    <Writer v-for="writer in writers" :data="writer"/>
-
-                </div>
+                <ArticleItem  @item-click="articleItemClick" v-for=" (articles,index) in articles" :data="articles"/>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    import ArticleItem from './ArticleItem';
-    import Writer from './WriterItem'
+    import ArticleItem from './../components/ArticleItem';
+    import Writer from './../components/WriterItem'
     export default {
-        name: "index",
+        name: "article-list",
         components:{
             ArticleItem,Writer,
         },
@@ -42,9 +31,6 @@
         },
 
         methods: {
-            write(){
-                this.$router.push({name: this.isLogin?'editor':'sign'})
-            },
             articleItemClick(data){
                console.log(data)
                 this.$router.push({name:'article',query:{article_id:data.id}})
@@ -53,21 +39,12 @@
                 this.http.get('/article/listAll', {}).then((data) => {
                     if(data.data&&data.data.length!==0){
                         this.articles=data.data;
+                        this.articles=this.articles.sort((a,b)=>b.id-a.id)
                     }
                     if(data.code!=200){
                         this.$notify({title: '提示', message: this.$createElement('i', {style: 'color: '+data.code===200?'blue':'red'}, data.msg)});
                     }
                 });
-                this.http.get('/user/allPerson', {user_id:this.userInfo.id}).then((data) => {
-                    if(data.data&&data.data.length!==0){
-                        this.writers=data.data;
-                    }
-                    if(data.code!=200){
-                        this.$notify({title: '提示', message: this.$createElement('i', {style: 'color: '+data.code===200?'blue':'red'}, data.msg)});
-                    }
-                });
-
-
             }
 
         },
@@ -97,11 +74,10 @@
         height: 100%;
         margin: 0 auto;
         display: flex;
-
     }
 
     .left {
-        margin:  2% 0 2% 2%;
+        margin: 0 15%;
         width: 70%;
         height: 100%;
     }
