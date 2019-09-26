@@ -66,13 +66,13 @@
     .index-page{
         width: 100%;
         height: calc(100% - 60px);
-        background-color: #f7f7f8;
         overflow: scroll;
     }
     .index-page-main{
         width: 1200px;
-        height: 100%;
+        min-height: 100%;
         margin: 0 auto;
+        background-color: #f7f7f8;
         display: flex;
     }
 

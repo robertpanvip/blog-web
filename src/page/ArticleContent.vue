@@ -30,7 +30,8 @@
                 </div>
             </div>
             <div class="writer">
-                <img class="writer-head-img" src="../static/img/head.jpg">
+                <img v-if="article.head_url" class="writer-head-img" :src="article.head_url">
+                <img v-else class="writer-head-img" src="../static/img/head.jpg">
                 <div class="writer-info">
                     <span class="writer-name">{{article.name}}</span><span class="follow" :class="!followed? 'action-press':''" @click="follow">关注</span><br/>
                     <span class="writer-name-bellow">{{actionInfo.userArticle.length}}篇文章，{{actionInfo.userArticle.flow}}人气，{{actionInfo.follow.length}}粉丝</span>
@@ -38,7 +39,8 @@
             </div>
             <h2 class="comment-title">评论({{actionInfo.comments.length}})</h2>
             <div class="comment">
-                <img class="head" src="../static/img/head.jpg">
+                <img v-if="info.head_url" class="head"  :src="info.head_url">
+                <img v-else class="head" src="../static/img/head.jpg">
                 <div class="text-area-main">
                     <textarea v-model="commentContent" placeholder="评论或者提问" @keyup.enter="keyDown"></textarea>
                     <div class="comment-publish">
@@ -80,7 +82,7 @@
         data() {
             return {
                 id: this.$route.query.article_id,
-                info :JSON.parse(localStorage.getItem('userInfo')),
+                info :JSON.parse(localStorage.getItem('userInfo'))||{},
                 article: {},
                 actionInfo: {
                     userArticle: {},
@@ -254,6 +256,8 @@
         },
 
         created() {
+            console.log('------')
+            console.log(this)
             this.getData()
             console.log(this.id)
         },

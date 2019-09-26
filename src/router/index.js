@@ -35,6 +35,52 @@ let router = new VueRouter({
                     component: () => import('@/page/Follow'),
                     meta: {name: 'follow'},
                 },
+                {
+                    path: '/person',
+                    name: 'person',
+                    component: () => import('@/page/PersonInfo'),
+                    meta: {name: 'person'},
+                    redirect:()=>'/person/history',
+                    children: [
+                        {
+                            path: '/person/history',
+                            name: 'publishHistory',
+                            component: () => import('@/page/PublishHistory'),
+                            meta: {name: 'publishHistory'},
+                        },
+                        {
+                            path: '/person/collectionList',
+                            name: 'collectionList',
+                            component: () => import('@/page/CollectionList'),
+                            meta: {name: 'collectionList'},
+                        },
+                        {
+                            path: '/person/comment',
+                            name: 'comment',
+                            component: () => import('@/page/Comment'),
+                            meta: {name: 'comment'},
+                        },
+                        {
+                            path: '/person/leaveMessage',
+                            name: 'leaveMessage',
+                            component: () => import('@/page/LeaveMessage'),
+                            meta: {name: 'leaveMessage'},
+                        },
+                        {
+                            path: '/person/message',
+                            name: 'message',
+                            component: () => import('@/page/Message'),
+                            meta: {name: 'message'},
+                        },
+                        {
+                            path: '/person/userArticle',
+                            name: 'userArticle',
+                            component: () => import('@/page/UserArticle'),
+                            meta: {name: 'userArticle'},
+                        },
+
+                    ]
+                },
 
             ]
         },
@@ -50,12 +96,7 @@ let router = new VueRouter({
             component: () => import('@/page/Editor'),
             meta: {name: 'editor'},
         },
-        {
-            path: '/person',
-            name: 'person',
-            component: () => import('@/page/PersonInfo'),
-            meta: {name: 'person'},
-        },
+
 
     ]
 });

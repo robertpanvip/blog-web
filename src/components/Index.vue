@@ -11,7 +11,7 @@
                         <h3>推荐作者</h3>
                         <h4>更多</h4>
                     </div>
-                    <Writer v-for="writer in writers" :data="writer"/>
+                    <Writer v-for="writer in writers" :data="writer" @refresh="getWriterData"/>
 
                 </div>
             </div>
@@ -49,15 +49,7 @@
                console.log(data)
                 this.$router.push({name:'article',query:{article_id:data.id}})
             },
-            getAllData(){
-                this.http.get('/article/listAll', {}).then((data) => {
-                    if(data.data&&data.data.length!==0){
-                        this.articles=data.data;
-                    }
-                    if(data.code!=200){
-                        this.$notify({title: '提示', message: this.$createElement('i', {style: 'color: '+data.code===200?'blue':'red'}, data.msg)});
-                    }
-                });
+            getWriterData(){
                 this.http.get('/user/allPerson', {user_id:this.userInfo.id}).then((data) => {
                     if(data.data&&data.data.length!==0){
                         this.writers=data.data;
@@ -66,8 +58,16 @@
                         this.$notify({title: '提示', message: this.$createElement('i', {style: 'color: '+data.code===200?'blue':'red'}, data.msg)});
                     }
                 });
-
-
+            },
+            getListData(){
+                this.http.get('/article/listAll', {}).then((data) => {
+                    if(data.data&&data.data.length!==0){
+                        this.articles=data.data;
+                    }
+                    if(data.code!=200){
+                        this.$notify({title: '提示', message: this.$createElement('i', {style: 'color: '+data.code===200?'blue':'red'}, data.msg)});
+                    }
+                });
             }
 
         },
@@ -75,7 +75,8 @@
         filters: {},
 
         mounted(){
-           this.getAllData()
+           this.getListData()
+            this.getWriterData()
         },
 
         created() {
@@ -89,15 +90,14 @@
     .index-page{
         width: 100%;
         height: calc(100% - 60px);
-        background-color: #f7f7f8;
         overflow: scroll;
     }
     .index-page-main{
         width: 1200px;
-        height: 100%;
+        min-height: 100%;
         margin: 0 auto;
         display: flex;
-
+        background-color: #f7f7f8;
     }
 
     .left {

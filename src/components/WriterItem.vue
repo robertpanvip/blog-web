@@ -44,7 +44,8 @@
 
         data() {
             return {
-                userInfo :JSON.parse(localStorage.getItem('userInfo')),
+                isLogin:JSON.parse(localStorage.getItem('isLogin')),
+                userInfo :JSON.parse(localStorage.getItem('userInfo'))||{},
             }
         },
 
@@ -53,6 +54,13 @@
              * 关注
              */
             follow() {
+                if(!this.isLogin){
+                    this.$router.push({name:'sign'})
+                    return ;
+                }
+
+
+
                 this.http.get('/action/follow', {
                     user_id: this.userInfo.id,
                     follow_user_id: this.data.id,
@@ -67,8 +75,10 @@
                             message: this.$createElement('i', {style: 'color: ' + data.code === 200 ? 'blue' : 'red'}, data.msg)
                         });
 
-                    }else
-                        this.getData()
+                    }else{
+                        this.$emit('refresh')
+                    }
+
                 });
             },
         },

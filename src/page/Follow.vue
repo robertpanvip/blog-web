@@ -29,7 +29,7 @@
                 follow_articles:[],
                 clicked_follow:'',
                 follow_articles_copy:[],
-                userInfo :JSON.parse(localStorage.getItem('userInfo')),
+                userInfo :JSON.parse(localStorage.getItem('userInfo'))||{},
             }
         },
 
@@ -91,7 +91,6 @@
         height: calc(100% - 60px);
         padding: 10px;
         box-sizing: border-box;
-        background-color: #c0c7d1;
         display: flex;
     }
 

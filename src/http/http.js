@@ -1,5 +1,5 @@
 import axios from 'axios';
-//const base_url='http://www.nerversea.cn:8050';
+//const base_url=window.location.origin+':8040';
 const base_url='';
 // 允许携带cookie
 axios.defaults.withCredentials=true

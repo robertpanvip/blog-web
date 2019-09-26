@@ -34,7 +34,7 @@
         data(){
             return{
                 clickIndex:0,
-                userInfo :JSON.parse(localStorage.getItem('userInfo')),
+                userInfo :JSON.parse(localStorage.getItem('userInfo'))||{},
                 articles:[{title:'',content:'',publish_time:''}],
             }
         },
@@ -128,7 +128,7 @@
 
             subOk(){
                 this.articles[this.clickIndex].content=editor.txt.html();
-                this.articles[this.clickIndex].user_id='2';
+                this.articles[this.clickIndex].user_id=this.userInfo.id;
                 this.articles[this.clickIndex].publish_time=moment().format("YYYY-MM-DD HH:MM:SS");
                 this.articles[this.clickIndex].preview=this.articles[this.clickIndex].content.substr(0,100);
                 if( this.articles[this.clickIndex].id==null){
@@ -154,6 +154,7 @@
         height: 100%;
         text-align: left;
         display: flex;
+        background-color: #f7f7f8;
     }
 
     .editor {

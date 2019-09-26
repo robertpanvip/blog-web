@@ -1,3 +1,4 @@
+const CompressionPlugin = require('compression-webpack-plugin')
 // 这里只列一部分，具体配置惨考文档啊
 module.exports = {
     // baseUrl  type:{string} default:'/'
@@ -42,7 +43,25 @@ module.exports = {
     productionSourceMap: false,
     // devServer:{type:Object} 3个属性host,port,https
     // 它支持webPack-dev-server的所有选项
+    configureWebpack: (config) => {
+        if (process.env.NODE_ENV === 'production') { // 为生产环境修改配置...
+            config.mode = 'production'
+            return {
+                plugins: [new CompressionPlugin({
+                    test: /\.js$|\.html$|\.css/, //匹配文件名
+                    threshold: 1024, //对超过10k的数据进行压缩
+                    deleteOriginalAssets: false //是否删除原文件
+                })]
+            }
+        }
+    },
+    chainWebpack: config => {
+        config.plugins.delete('prefetch')
 
+        config
+            .plugin('webpack-bundle-analyzer')
+            .use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin)
+    },
     devServer: {
         port: 8085, // 端口号
         host: '192.168.0.108',
@@ -52,19 +71,19 @@ module.exports = {
         proxy: {
             '/user': {
                 //ws: true,
-                target:'http://192.168.0.108:8050',
+                target: 'http://192.168.0.108:8050',
                 changeOrigin: true,
 
             },
             '/article': {
                 //ws: true,
-                target:'http://192.168.0.108:8050',
+                target: 'http://192.168.0.108:8050',
                 changeOrigin: true,
 
             },
-            '/action' :{
+            '/action': {
                 //ws: true,
-                target:'http://192.168.0.108:8050',
+                target: 'http://192.168.0.108:8050',
                 changeOrigin: true,
 
             },
