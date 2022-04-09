@@ -14,7 +14,7 @@
     "core-js": "^2.6.5",
     "dialog-model": "^1.0.8",
     "element-ui": "^2.8.2",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "vue": "^2.6.10",
     "vue-cropper": "^0.4.9",
     "vue-router": "^3.0.6",
